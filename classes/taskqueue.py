@@ -1,5 +1,5 @@
 from time import time
-from uuid import uuid4
+
 
 class TaskQueue:
 
@@ -10,10 +10,7 @@ class TaskQueue:
     def __str__(self):
         return self._queue
 
-    def add(self, queue_name, data, data_len, uuid = None):
-        if not uuid:
-            print("Generating uuid in TaskQueue obj.")
-            uuid = uuid4().bytes
+    def add(self, queue_name, data, data_len, uuid):
         if queue_name in self._queue:
             self._queue[queue_name].update({uuid: {"data": data, "data_len": data_len, "timestamp": 0}})
         else:

@@ -4,15 +4,15 @@ from uuid import uuid4
 from re import compile
 import pickle
 
-# TODO: CTRL+C exception
-def prompt_shutdown():
-    while True:
-        print('"CTRL+C" detected, shutdown server?', end=" ")
-        rep = input('(yes|no)')
-        if rep == 'yes':
-            return True
-        elif rep == 'no':
-            return False
+# TODO: maybe CTRL+C exception
+# def prompt_shutdown():
+#     while True:
+#         print('"CTRL+C" detected, shutdown server?', end=" ")
+#         rep = input('(yes|no)')
+#         if rep == 'yes':
+#             return True
+#         elif rep == 'no':
+#            return False
 
 
 class TaskQueueServer:
@@ -48,14 +48,20 @@ class TaskQueueServer:
 
     def restore_from_journal(self):
         try:
-            f = open(self._path+'journal.bkp')
+            f = open(self._path+'journal.bkp', 'r')
         except FileNotFoundError:
             print(f'No "journal.bkp" file found in "{self._path}".')
         else:
             print("Found journal file, trying to restore state.\nRestored commands:")
             pattern = compile('{.*?}')
-            line = f.readline()
+            # match = pattern.findall(f.read()) #Not stream like but maybe safe
+            # for cmd in match:
+            #     cmd = eval(cmd)
+            #     rep = self.run_cmd(cmd, False)
+            #     print(f"Cmd: {cmd} -> Rep: {rep}")
+            # f.close()
             idx = 0
+            line = f.readline()
             while line:
                 match = pattern.match(line)
                 if match:
@@ -94,7 +100,8 @@ class TaskQueueServer:
             return self._run_save()
 
     def _run_add(self, cmd, journal):
-        cmd.update({"task_id": uuid4().bytes})
+        if not cmd.get('task_id'):
+            cmd.update({"task_id": uuid4().bytes})
         if journal:
             self.write_journal(cmd)
         return self._queue.add(cmd['queue_name'], cmd['data'], cmd['data_len'], cmd['task_id'])

@@ -22,8 +22,9 @@ class SocketCmdServer:
 
     def start_polling(self, callback):
         with socket.socket(socket.AF_INET, socket.SOCK_STREAM) as s:
+            s.setsockopt(socket.SOL_SOCKET, socket.SO_REUSEADDR, 1)
             s.bind((self._ip, self._port))
-            s.listen(10)
+            s.listen(1)
             while True:
                 conn, addr = s.accept()
                 data = conn.recv(1024)
@@ -35,10 +36,11 @@ class SocketCmdServer:
                         data_len = int(data_len.decode())
                         cmd['data'] += self._recieve(conn, data_len - len(cmd['data']))
                     ans = callback(cmd)
+                    print(ans)
                     if ans:
-                        conn.sendall(ans)
+                        conn.send(ans)
                 else:
-                    conn.send(bytes("ERROR", 'utf8'))
+                    conn.send(b"ERROR")
                 conn.close()
 
     def _parse_cmd(self, data):
