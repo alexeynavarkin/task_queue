@@ -1,0 +1,4 @@
+{'cmd_type': b'ADD', 'queue_name': b'1', 'data_len': b'5', 'data': b'12345', 'task_id': b'\x0f=\r\x05\xf6\xdaG\x97\xbd9\xd3&\x8f\xbd\xb8Y'}
+{'cmd_type': b'ADD', 'queue_name': b'1', 'data_len': b'5', 'data': b'12345', 'task_id': b'T\xb2\x8e\x0b[\x01G\xa1\x96\x1da\xd6\xb3A\xec\xa2'}
+{'cmd_type': b'ACK', 'queue_name': b'1', 'task_id': b'T\xb2\x8e\x0b[\x01G\xa1\x96\x1da\xd6\xb3A\xec\xa2'}
+{'cmd_type': b'ACK', 'queue_name': b'1', 'task_id': b'T\xb2\x8e\x0b[\x01G\xa1\x96\x1da\xd6\xb3A\xec\xa2'}
