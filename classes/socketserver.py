@@ -1,4 +1,4 @@
-from re import compile
+from re import compile, DOTALL
 import socket
 
 
@@ -17,7 +17,7 @@ class SocketCmdServer:
                         '(?P<cmd_type>IN) (?P<queue_name>\S+) (?P<task_id>.+)',
                         '(?P<cmd_type>SAVE)']
         for idx in range(len(cmd_patterns)):
-            cmd_patterns[idx] = compile(bytes(cmd_patterns[idx], 'utf8'))
+            cmd_patterns[idx] = compile(bytes(cmd_patterns[idx], 'utf8'), DOTALL)
         return cmd_patterns
 
     def start_polling(self, callback):
@@ -28,6 +28,7 @@ class SocketCmdServer:
             while True:
                 conn, addr = s.accept()
                 data = conn.recv(1024)
+                print(f"RAW: {data}")
                 if not data: break
                 cmd = self._parse_cmd(data)
                 if cmd:
@@ -37,6 +38,10 @@ class SocketCmdServer:
                         cmd['data'] += self._recieve(conn, data_len - len(cmd['data']))
                     ans = callback(cmd)
                     if ans:
+                        print('-----------SERV-----------')
+                        print(f"RECV: {cmd}")
+                        print(f"SEND: {ans}")
+                        print('--------------------------')
                         conn.send(ans)
                 else:
                     conn.send(b"ERROR")

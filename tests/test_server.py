@@ -66,11 +66,14 @@ class ServerBaseTest(TestCase):
             pass
 
     def send(self, command):
-        s = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
-        s.connect(('127.0.0.1', 5555))
-        s.send(command)
-        data = s.recv(1000000)
-        s.close()
+        with socket.socket(socket.AF_INET, socket.SOCK_STREAM) as s:
+            s.connect(('127.0.0.1', 5555))
+            s.send(command)
+            data = s.recv(1000000)
+            print('-----------TEST-----------')
+            print(f"SEND: {command}")
+            print(f"RECV: {data}")
+            print('--------------------------')
         return data
 
     def test_base_scenario(self):
@@ -123,7 +126,7 @@ class ServerJournalTest(TestCase):
     def run_server(self):
         self.server = subprocess.Popen(['python3', 'server.py'])
         # даем серверу время на запуск
-        time.sleep(0.5)
+        time.sleep(1)
 
     def stop_server(self):
         self.server.terminate()
@@ -260,7 +263,7 @@ class ServerSaveTest(TestCase):
         self.assertEqual(b'NO', self.send(b'ACK 1 ' + second_task_id))
 
     def test_long_input(self):
-        data = '12345' * 1000
+        data = '12345' * 10000
         data = '{} {}'.format(len(data), data)
         data = data.encode('utf')
         task_id = self.send(b'ADD 1 ' + data)
@@ -270,7 +273,7 @@ class ServerSaveTest(TestCase):
         self.stop_server()
         self.run_server()
 
-#         self.assertEqual(task_id + b' ' + data, self.send(b'GET 1'))
+        self.assertEqual(task_id + b' ' + data, self.send(b'GET 1'))
 
 
 
