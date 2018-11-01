@@ -36,7 +36,6 @@ class SocketCmdServer:
                         data_len = int(data_len.decode())
                         cmd['data'] += self._recieve(conn, data_len - len(cmd['data']))
                     ans = callback(cmd)
-                    print(ans)
                     if ans:
                         conn.send(ans)
                 else:

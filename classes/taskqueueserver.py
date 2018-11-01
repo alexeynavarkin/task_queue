@@ -35,12 +35,12 @@ class TaskQueueServer:
 
     def restore(self):
         try:
-            f = open(self._path+'queue.bkp', 'rb')
+            f = open(self._path + 'queue.bkp', 'rb')
             bkp = pickle.load(f)
         except FileNotFoundError:
             print(f'No "queue.bkp" file found in "{self._path}".')
         except EOFError:
-            print()
+            print(f'File "{self._path}/queue.bkp" empty.')
         else:
             f.close()
             self._queue = bkp
@@ -48,36 +48,24 @@ class TaskQueueServer:
 
     def restore_from_journal(self):
         try:
-            f = open(self._path+'journal.bkp', 'r')
+            f = open(self._path + 'journal.bkp', 'rb')
+            idx = 0
+            while True:
+                try:
+                    cmd = pickle.load(f)
+                    res = self.run_cmd(cmd, False)
+                    idx += 1
+                except EOFError:
+                    break
         except FileNotFoundError:
             print(f'No "journal.bkp" file found in "{self._path}".')
         else:
-            print("Found journal file, trying to restore state.\nRestored commands:")
-            pattern = compile('{.*?}')
-            # match = pattern.findall(f.read()) #Not stream like but maybe safe
-            # for cmd in match:
-            #     cmd = eval(cmd)
-            #     rep = self.run_cmd(cmd, False)
-            #     print(f"Cmd: {cmd} -> Rep: {rep}")
-            # f.close()
-            idx = 0
-            line = f.readline()
-            while line:
-                match = pattern.match(line)
-                if match:
-                    idx += 1
-                    cmd = eval(match.group())
-                    rep = self.run_cmd(cmd, False)
-                    print(f"{idx}.Cmd: {cmd} -> Rep: {rep}")
-                    line = f.readline()
-            if idx:
-                print("End restored commands.")
-            else:
-                print("Journal file empty.")
+            f.close()
+            print(f"Restored {idx} commands from last consistent state.")
 
     def write_journal(self, cmd):
-        with open(self._path+'journal.bkp', 'a') as f:
-            f.write(str(cmd)+'\n')
+        with open(self._path+'journal.bkp', 'ab') as f:
+            pickle.dump(cmd, f)
 
     def wipe_journal(self):
         with open(self._path + 'journal.bkp', 'w') as f:
