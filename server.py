@@ -1,4 +1,4 @@
-from classes import TaskQueueServer
+from taskqueueserver import TaskQueueServer
 import argparse
 
 def parse_args():

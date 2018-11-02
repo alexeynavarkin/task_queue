@@ -6,7 +6,8 @@ import socket
 import unittest
 import subprocess
 
-from classes import TaskQueue
+from taskqueueserver import TaskQueue
+
 
 class TaskQueueBaseTest(TestCase):
     def test_timeout(self,):
@@ -224,7 +225,7 @@ class ServerSaveTest(TestCase):
         s = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
         s.connect(('127.0.0.1', 5555))
         s.send(command)
-        data = s.recv(1000000)
+        data = s.recv(100000)
         s.close()
         return data
 
@@ -263,7 +264,7 @@ class ServerSaveTest(TestCase):
         self.assertEqual(b'NO', self.send(b'ACK 1 ' + second_task_id))
 
     def test_long_input(self):
-        data = '12345' * 10000
+        data = '12345' * 1000
         data = '{} {}'.format(len(data), data)
         data = data.encode('utf')
         task_id = self.send(b'ADD 1 ' + data)
@@ -274,7 +275,6 @@ class ServerSaveTest(TestCase):
         self.run_server()
 
         self.assertEqual(task_id + b' ' + data, self.send(b'GET 1'))
-
 
 
 if __name__ == '__main__':

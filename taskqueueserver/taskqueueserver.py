@@ -1,7 +1,6 @@
 from .socketserver import SocketCmdServer
 from .taskqueue import TaskQueue
 from uuid import uuid4
-from re import compile
 import pickle
 
 # TODO: maybe CTRL+C exception

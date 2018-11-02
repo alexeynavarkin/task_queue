@@ -29,7 +29,8 @@ class SocketCmdServer:
                 conn, addr = s.accept()
                 data = conn.recv(1024)
                 print(f"RAW: {data}")
-                if not data: break
+                if not data:
+                    break
                 cmd = self._parse_cmd(data)
                 if cmd:
                     data_len = cmd.get('data_len')
